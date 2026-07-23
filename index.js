@@ -8,6 +8,7 @@ let tasks = [
     {id: 2 , title:"do leetcode problems" , done: false},
     {id: 3 , title:"do codeforces problems", done: false}
 ];
+let id = 3 ;
 
 const descirbe = {
          "name": "Task API", 
@@ -41,10 +42,10 @@ app.get('/tasks/:id',(req,res)=>{
     const id = req.params.id ;
     let exists = false ;
 
-    const obj = tasks.filter((task)=>{
+    const obj = tasks.find((task)=>{
         if(task.id == id){
             exists = true ;
-            return task ;
+            return true ;
         }
     });
 
@@ -58,10 +59,10 @@ app.get('/tasks/:id',(req,res)=>{
 // --------------------------------------------------
 // STAGE - 3
 app.post('/tasks',(req,res)=>{
-    let next_id = tasks.length +1 ;
-
+    
     if(Object.keys(req.body).length === 0){
         res.status(400).json({error:"Body of POST request cannot be empty"}) ;
+        return ;
     }
     else if(!req.body.title){
         res.status(400).json({error:"Title not found in request"}) ;
@@ -72,17 +73,79 @@ app.post('/tasks',(req,res)=>{
             res.status(400).json({error:"Title cannot be empty"}) ;
             res.end() ;
         }else{
+            id++;
+            let next_id = id ;
             let task_title = req.body.title ; 
             tasks = [
                 ...tasks,
                 {id:next_id , title: task_title , done:false}
             ];
-            res.status(201).json(tasks[next_id-1]);
+            res.status(201).json(tasks[tasks.length-1]);
         }
     }
     //console.log(typeof(req.body));
 });
 
+// --------------------------------------------------
+// STAGE - 4
+app.put('/tasks/:id',(req,res)=>{
+    const curr_id = req.params.id ;
+    let idx = 0 ;
+
+    let exists = false ;
+    tasks.forEach((task,index)=>{
+        if(task.id == curr_id){
+            exists = true ;
+            idx = index ;
+        }
+    });
+
+    if(!exists){
+        res.status(404).json({error : `Task ${req.params.id} not found`}) ;
+    }
+    else if(Object.keys(req.body).length === 0){
+        res.status(400).json({error:"Body of PUT request cannot be empty"}) ;
+    }
+    else if(!req.body.title===undefined && req.body['done'] === undefined){
+        res.status(400).json({error:"Title not found in request"}) ;
+    }
+    else if(req.body['done'] !== undefined){
+        tasks[idx].done = req.body.done ;
+        if(req.body.title !== undefined && req.body.title.trim() !== ""){
+            tasks[idx]['title'] = req.body.title ;
+        }
+        res.json(tasks[idx]);
+    }
+    else{
+        // .trim() method removes the extra spaces before and after the string 
+        if(req.body.title.trim() === ""){
+            res.status(400).json({error:"Title cannot be empty"}) ;
+        }else{
+            tasks[idx]['title'] = req.body.title ;
+            tasks[idx]['done'] = req.body.done === undefined ? tasks[idx]['done'] : req.body.done;
+            res.status(200).json(tasks[idx]);
+        }
+    }
+});
+ // important note : javascript returns undefined if we try to access a key that doesnt exist
+app.delete('/tasks/:id' , (req,res)=>{
+    let curr_id = 0 ;
+
+    let exists = false ;
+    tasks.forEach((task,index)=>{
+        if(task.id == req.params.id){
+            exists = true ;
+            curr_id = index ;
+        }
+    });
+
+    if(!exists){
+        res.status(404).json({error : `Task ${req.params.id} not found`}) ;
+    }else{
+        tasks.splice(curr_id,1) ;
+        res.status(204).end() ;
+    }
+});
 
 // --------------------------------------------------
 // STAGE - 0
