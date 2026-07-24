@@ -1,7 +1,11 @@
-import express from 'express';
+const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./openapi.json');
 
 const app = express() ;
 const PORT = 3000 ;
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
 
 let tasks = [
     {id : 1 , title:"do flyrank assignment" , done: true},
@@ -11,9 +15,9 @@ let tasks = [
 let id = 3 ;
 
 const descirbe = {
-         "name": "Task API", 
-         "version": "1.0", 
-         "endpoints": ["/tasks"] 
+         name: "Task API", 
+         version: "1.0", 
+         endpoints: ["/tasks"] 
 };
 
 const status = { "status": "ok" } ;

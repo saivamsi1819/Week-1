@@ -1,0 +1,303 @@
+{
+	"openapi" : "3.0.3",
+
+	"info": {
+		"title": "Simple Task API",
+		"description": "Simple CRUD API for managing tasks",
+		"version": "1.0.0"
+	},
+
+	"server": [
+		{
+			"url": "http://localhost:3000"
+		}
+	],
+
+	"paths":{
+		"/":{
+			"get":{
+				"summary": "Gets api description",
+				"description": "Gets some information about our api",
+
+				"responses": {
+					"200":{
+						"descrpition": "Succesful request",
+						"content":{
+							"application/json":{
+								"schema":{
+									"type":"object",
+									"properties":{
+										"name":{"type":"string"},
+										"version":{"type":"string"},
+										"endpoints":{"type":"array"}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/health":{
+			"get":{
+				"summary": "Status of server",
+				"description": "Gets the health of the server alive or dead",
+
+				"responses":{
+					"200":{
+						"summary": "Successful retrival",
+						"content":{
+							"application/json": {
+								"schema":{
+									"type":"object",
+									"properties":{
+										"status":{"type":"string"}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/tasks": {
+			"get": {
+				"summary": "Get all tasks",
+				"description": "Returns a list of all tasks",
+
+				"responses": {
+					"200": {
+						"description": "Successful response",
+
+						"content":{
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items":{
+										"type": "object",
+										"properties": {
+												"id":{"type":"integer"},
+												"title":{"type":"string"},
+												"done":{"type":"boolean"}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			
+			"post": {
+				"summary": "Add a new task",
+				"description":"adds a new task to the list of tasks",
+				"requestBody": {
+					"required": true,
+					"content":{
+						"application/json":{
+							"schema":{
+								"type":"object",
+								"properties":{
+									"title": {"type":"string"}
+								}
+							},
+							"required":[ "title" ]
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Successful response",
+
+						"content":{
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties":{
+										"id":{"type":"integer"},
+										"title":{"type":"string"},
+										"done":{"type":"boolean"}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request body",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {"type": "string"}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/tasks/{id}": {
+			"get": {
+				"summary": "Get a specific task",
+				"desciption": "Returns a task with mentioned id in the url",
+
+				"parameters": [
+						{
+							"name": "id",
+							"in": "path",
+							"required": true,
+							"schema": {
+								"type": "integer"
+							}
+						}
+				],
+
+				"responses": {
+					"200": {
+						"description": "Successful response",
+
+						"content":{
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"id":{"type":"integer"},
+										"title":{"type":"string"},
+										"done":{"type":"boolean"}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Task Not found",
+						"content":{
+							"application/json": {
+								"schema":{
+									"type":"object",
+									"properties":{
+										"error":{"type":"string"}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+
+			"put": {
+				"summary":"change a task",
+				"description": "Updates and Gives a task that has been updated by using Id.",
+
+				"parameters": [
+						{
+							"name": "id",
+							"in": "path",
+							"required": true,
+							"schema": {
+								"type": "integer"
+							}
+						}
+				],
+
+				"requestBody":{
+					"required": true,
+					"content":{
+						"application/json":{
+							"schema":{
+								"type":"object",
+								"properties":{
+									"title": {"type":"string"},
+									"done": {"type":"boolean"}
+								}
+							}
+						}
+					}
+				},
+				"responses":{
+					"200":{
+						"description": "Gives the updated task",
+						"content":{
+							"application/json":{
+								"schema":{
+									"type":"object",
+									"properties":{
+										"id":{"type":"integer"},
+										"title": {"type":"string"},
+										"done": {"type":"boolean"}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Task Not found",
+						"content":{
+							"application/json": {
+								"schema":{
+									"type":"object",
+									"properties":{
+										"error":{"type":"string"}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request body",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {"type": "string"}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+
+			"delete": {
+				"summary": "Delete a task",
+				"description": "Deletes a task using Id.",
+
+				"parameters": [
+						{
+							"name": "id",
+							"in": "path",
+							"required": true,
+							"schema": {
+								"type": "integer"
+							}
+						}
+				],
+
+				"responses": {
+					"204": {
+						"description": "Task deleted successfully"
+					},
+					"404": {
+						"description": "Task Not found",
+						"content":{
+							"application/json": {
+								"schema":{
+									"type":"object",
+									"properties":{
+										"error":{"type":"string"}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
