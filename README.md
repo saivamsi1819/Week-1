@@ -31,32 +31,59 @@ http://localhost:3000
 | DELETE | `/tasks/:id` | Deletes one task by id | `204 No Content` |
 | GET | `/docs` | Opens the Swagger UI documentation | `200 OK` |
 
-## Example Request
+## Status Codes
 
-After starting the server, test it with:
+| Status Code | Meaning |
+| --- | --- |
+| `200 OK` | The request worked and the API returned data. |
+| `201 Created` | A new task was created successfully. |
+| `204 No Content` | A task was deleted successfully. There is no response body. |
+| `400 Bad Request` | The request body is missing or invalid. |
+| `404 Not Found` | The task id does not exist. |
+
+## Sample Inputs and Outputs
+
+### Check Server Health
+
+This checks if the API is running.
 
 ```bash
 curl -i http://localhost:3000/health
 ```
 
-Example output:
+Output:
 
 ```http
 HTTP/1.1 200 OK
-X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
-Content-Length: 15
-ETag: W/"f-VaSQ4oDUiZblZNAEkkN+sX+q3Sg"
-Date: Fri, 24 Jul 2026 09:34:56 GMT
-Connection: keep-alive
-Keep-Alive: timeout=5
 
 {"status":"ok"}
 ```
 
-## Request Body Examples
+### Get All Tasks
 
-Create a task:
+This returns the current list of tasks.
+
+```bash
+curl -i http://localhost:3000/tasks
+```
+
+Output:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+[
+  {"id":1,"title":"do flyrank assignment","done":true},
+  {"id":2,"title":"do leetcode problems","done":false},
+  {"id":3,"title":"do codeforces problems","done":false}
+]
+```
+
+### Create a Task
+
+This creates a new task. Only `title` is required in the request body.
 
 ```bash
 curl -i -X POST http://localhost:3000/tasks \
@@ -64,7 +91,37 @@ curl -i -X POST http://localhost:3000/tasks \
   -d '{"title":"learn swagger"}'
 ```
 
-Update a task:
+Output:
+
+```http
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+
+{"id":4,"title":"learn swagger","done":false}
+```
+
+### Create Task Error
+
+This happens when the request body is empty.
+
+```bash
+curl -i -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+Output:
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+
+{"error":"Body of POST request cannot be empty"}
+```
+
+### Update a Task
+
+This updates an existing task by id.
 
 ```bash
 curl -i -X PUT http://localhost:3000/tasks/1 \
@@ -72,10 +129,44 @@ curl -i -X PUT http://localhost:3000/tasks/1 \
   -d '{"title":"finish assignment","done":true}'
 ```
 
-Delete a task:
+Output:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{"id":1,"title":"finish assignment","done":true}
+```
+
+### Task Not Found Error
+
+This happens when the task id does not exist.
+
+```bash
+curl -i http://localhost:3000/tasks/99
+```
+
+Output:
+
+```http
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+
+{"error":"Task 99 not found"}
+```
+
+### Delete a Task
+
+This deletes a task by id.
 
 ```bash
 curl -i -X DELETE http://localhost:3000/tasks/1
+```
+
+Output:
+
+```http
+HTTP/1.1 204 No Content
 ```
 
 ## Swagger Documentation
